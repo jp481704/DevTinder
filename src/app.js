@@ -3,7 +3,6 @@ const app = express();
 const { adminAuth } = require("./middleware/auth.js");
 const Dbfunction = require("./config/dataBase.js");
 const User = require("./models/User");
-const { validateSignUpData } = require("./utils/validation.js");
 const bcrypt = require("bcrypt");
 
 const cookieParser = require("cookie-parser");
@@ -14,90 +13,6 @@ const { userAuth } = require("./middleware/auth.js");
 
 app.use(express.json());
 app.use(cookieParser());
-
-app.post("/singup", async (req, res) => {
-  try {
-    // validation of user data
-    validateSignUpData(req);
-
-    //Encrypting password
-    const { firstName, lastName, emailId, password } = req.body;
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    console.log("passwordHash", passwordHash);
-
-    //creating new  user  personal
-    const user = new User({
-      firstName,
-      lastName,
-      emailId,
-      password: passwordHash,
-    });
-    await user.save();
-    res.send("User created successfully");
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-
-// Login
-
-app.post("/login", async (req, res) => {
-  try {
-    const { emailId, password } = req.body;
-
-    const user = await User.findOne({ emailId: emailId });
-
-    if (!user) {
-      throw new Error("emailId is not registered");
-    }
-
-    const isPasswordValid = await user.validatePassword(password);
-
-    if (isPasswordValid) {
-      // create token
-
-      const token = await user.getJWT();
-
-      // Add the token to cookies and send the response bck to the user
-
-      res.cookie("token", token);
-      res.send("Login successful");
-    } else {
-      throw new Error("Invalid password");
-    }
-  } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
-  }
-});
-
-app.get("/profile", userAuth, async (req, res) => {
-  try {
-    
-
-    const user = req.user;
-    if (!user) {
-      throw new Error("User does not exist");
-    }
-
-    res.status(200).json(user);
-  } catch (err) {
-    console.error("ERROR:", err.message);
-
-    res.status(401).json({
-      message: err.message,
-    });
-  }
-});
-
-
-app.post("/sendConnectionRequest",userAuth, async (req,res)=>{
-
-  const user = req.user;
-   console.log("Sending a connection request");
-   res.send(user.firstName + " sent Connection request successfully");
-})
 
 app.get("/user", async (req, res) => {
   try {
