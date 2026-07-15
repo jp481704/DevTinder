@@ -5,33 +5,37 @@ const ConnectionRequest = require("../models/connectionRequest");
 
 const requestsRouter = express.Router();
 
+requestsRouter.post(
+  "/request/send/:status/:toUserId",
+  userAuth,
+  async (req, res) => {
+    try {
+      const fromUserId = req.user._id;
+      const toUserId = req.params.toUserId;
 
-requestsRouter.post("/request/send/:status/:toUserId",userAuth,async (req,res)=>{
+      const status = req.params.status;
 
-try{
+      const allowedStatus = ["ignore", "interested"];
 
-  const fromUserId = req.user._id;
-  const toUserId = req.params.toUserId;
+       
 
-  const status = req.params.status;
+      const connectionRequest = new ConnectionRequest({
+        fromUserId,
+        toUserId,
+        status,
+      });
+      const data = await connectionRequest.save();
+      res.json({
+        message: "connection request sent successfully",
+        data,
+      });
 
-
-  const connectionRequest = new ConnectionRequest({
-    fromUserId,
-    toUserId,
-    status
-  })
-  const data = await connectionRequest.save();
-  res.json({
-    message: "connection request sent successfully",
-    data,
-  });
-
-  console.log("fromUserId",fromUserId);
-  res.send("Request sent successfully")
-
-}catch(err){
-res.status(400).send("ERROR: " + err.message);}
-})
+      console.log("fromUserId", fromUserId);
+      res.send("Request sent successfully");
+    } catch (err) {
+      res.status(400).send("ERROR: " + err.message);
+    }
+  },
+);
 
 module.exports = requestsRouter;
