@@ -12,14 +12,15 @@ const { userAuth } = require("./middleware/auth.js");
 const authRouter = require("./routes/auth.js");
 const profileRouter = require("./routes/profile.js");
 const requestsRouter = require("./routes/requests.js");
+const userRouter = require("./routes/user.js");
 
 app.use(express.json());
 app.use(cookieParser());
 
-
-app.use("/",authRouter);
-app.use("/",profileRouter);
-app.use("/",requestsRouter)
+app.use("/", authRouter);
+app.use("/", profileRouter);
+app.use("/", requestsRouter);
+app.use("/", userRouter);
 
 app.get("/user", async (req, res) => {
   try {
@@ -39,8 +40,6 @@ app.delete("/delete", async (req, res) => {
     res.status(400).send("something went wrong");
   }
 });
-
-
 
 Dbfunction()
   .then(() => {
