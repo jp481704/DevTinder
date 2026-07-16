@@ -13,7 +13,16 @@ authRouter.post("/singup", async (req, res) => {
     validateSignUpData(req);
 
     //Encrypting password
-    const { firstName, lastName, emailId, password } = req.body;
+    const {
+      firstName,
+      lastName,
+      emailId,
+      password,
+      age,
+      gender,
+      about,
+      skills,
+    } = req.body;
 
     const passwordHash = await bcrypt.hash(password, 10);
 
@@ -25,6 +34,10 @@ authRouter.post("/singup", async (req, res) => {
       lastName,
       emailId,
       password: passwordHash,
+      age,
+      gender,
+      about,
+      skills,
     });
     await user.save();
     res.send("User created successfully");
@@ -62,10 +75,9 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-
-authRouter.post("/logout", async (req,res)=>{
-  res.cookie("token",null,{expires: new Date(Date.now())});
+authRouter.post("/logout", async (req, res) => {
+  res.cookie("token", null, { expires: new Date(Date.now()) });
   res.send("Logout successful");
-})
+});
 
 module.exports = authRouter;
