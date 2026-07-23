@@ -26,7 +26,6 @@ authRouter.post("/singup", async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    console.log("passwordHash", passwordHash);
 
     //creating new  user  personal
     const user = new User({
@@ -66,7 +65,7 @@ authRouter.post("/login", async (req, res) => {
       // Add the token to cookies and send the response bck to the user
 
       res.cookie("token", token);
-      res.send("Login successful");
+      res.send(user);
     } else {
       throw new Error("Invalid password");
     }
@@ -74,6 +73,7 @@ authRouter.post("/login", async (req, res) => {
     res.status(400).send("ERROR: " + err.message);
   }
 });
+
 
 authRouter.post("/logout", async (req, res) => {
   res.cookie("token", null, { expires: new Date(Date.now()) });
